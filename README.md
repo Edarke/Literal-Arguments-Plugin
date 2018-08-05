@@ -5,13 +5,13 @@ clear from context what purpose a literal parameter serves, so Intellij shows pa
  such cases. However, since most companies do not mandate the use of a specific IDE, style guides
   may require explicit comments for literal arguments. 
 
-This plugin adds a warning for literal parameters passed without a comment in front of them and 
-defines a quick fix to add an appropriate comment. The example the following method call
+This plugin adds a warning for literal parameters passed to a method and 
+defines a quick fix to add an appropriate comment. For example, the following method call
 ```java
 fetchCustomer(customerId, true)
 ```
 
-Can be transformed into this:
+Can be transformed into:
 
 ```java 
 fetchCustomer(customerId, /* validate= */ true)
@@ -30,6 +30,13 @@ Supported Literal Types:
 * java.util.Optional.empty() and com.google.common.base.Optional.absent()
 * Casting one of the above to another type (eg (byte) 0)
 
-Literal chars and Strings are ignored because their purpose is usually evident from their content.
+Literal chars and Strings are ignored because their purpose is usually evident from their content
+. Additionally inspection is disabled for many of the same methods which Intellij's parameter 
+hinting is disabled for (eg String.charAt(0) will not require comments)
 
 There is limited support for configuring the format of the generated comment.
+
+
+## How to install  
+Download the jar from releases. Open Intellij, File > Settings > Plugins > Install from disk. 
+Restart. 

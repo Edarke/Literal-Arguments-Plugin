@@ -1,0 +1,15 @@
+<idea-plugin>
+    <id>LiteralArguments</id>
+    <name>Literal Arguments</name>
+    <version>0.1.2</version>
+    <description>Require literals arguments passed to methods to be prefixed with a comment</description>
+    <idea-version since-build="139.0"/>
+    <depends>com.intellij.modules.java</depends>
+
+    <application-components>
+        <component>
+            <implementation-class>com.github.edarke.literalcomments.LiteralArgumentsProvider</implementation-class>
+        </component>
+    </application-components>
+</idea-plugin>
+
