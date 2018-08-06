@@ -11,7 +11,7 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class OptionalRefactor extends PsiElementBaseIntentionAction implements IntentionAction {
+public class OptionalRefactor extends PsiElementBaseIntentionAction implements IntentionAction, SettingAccessor {
 
   @NotNull
   public String getText() {
@@ -91,7 +91,7 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements I
         PsiParameter param = parameters[index];
 
         final PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-        String commentContent = String.format(LiteralArgumentsInspection.COMMENT_FORMAT, param.getName());
+        String commentContent = String.format(getCommentFormat(), param.getName());
         PsiComment comment = factory.createCommentFromText(commentContent, null);
         argument.getParent().addBefore(comment, argument);
         CodeStyleManager.getInstance(project).reformat(arguments);

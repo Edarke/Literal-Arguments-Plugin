@@ -1,0 +1,10 @@
+public class X {
+  {
+     foo(/* isMale= */ true)
+  }
+
+  void foo(boolean isMale) {
+    String title = isMale ? "Mr." : "Ms.";
+    System.out.println("title = " + title);
+ }
+}
