@@ -1,9 +1,21 @@
 <idea-plugin>
+    <vendor email="evancdarke@gmail.com" url="https://github.com/Edarke/Literal-Arguments-Plugin">Evan Darke</vendor>
     <id>LiteralArguments</id>
     <name>Literal Arguments</name>
-    <version>0.1.2</version>
-    <description>Require literals arguments passed to methods to be prefixed with a comment</description>
+    <version>0.1.1</version>
+    <description><![CDATA[
+    <p>Produces a warning when literals arguments are passed to methods without a comment.
+        Suggests QuickFix to add inline comments to method calls with literal arguments. </p>
+        For example the following code:<br>
+            <code>fetchCustomer(customerId, true)</code><br>
+        Can be transformed into:<br>
+            <code>fetchCustomer(customerId, /* validate= */ true)}</code><br>
+     <p>Common methods and String parameters are ignored for this inspection, but the above refactoring
+     can also be applied to any parameter or method by placing the cursor next to the argument and
+     selecting Alt+Enter > 'Add inline comment for parameter'</p>
+    ]]></description>
     <idea-version since-build="139.0"/>
+
     <depends>com.intellij.modules.java</depends>
 
     <application-components>
@@ -11,5 +23,12 @@
             <implementation-class>com.github.edarke.literalcomments.LiteralArgumentsProvider</implementation-class>
         </component>
     </application-components>
+
+
+    <extensions defaultExtensionNs="com.intellij">
+        <intentionAction>
+            <className>com.github.edarke.literalcomments.OptionalRefactor</className>
+        </intentionAction>
+    </extensions>
 </idea-plugin>
 

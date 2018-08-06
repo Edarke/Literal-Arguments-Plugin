@@ -3,11 +3,13 @@ package com.github.edarke.literalcomments;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.codeInsight.daemon.GroupNames;
 import com.intellij.codeInspection.*;
+import com.intellij.lang.jvm.JvmParameter;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.refactoring.RefactoringActionHandler;
 import com.intellij.ui.DocumentAdapter;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +42,7 @@ public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionT
     private static final ImmutableSet<String> EXEMPT_TYPES = ImmutableSet.of(String.class.getName(),
             char.class.getName());
 
-    private static String COMMENT_FORMAT = "/* %s= */";
+    static String COMMENT_FORMAT = "/* %s= */";
 
     @NonNls
     private static final String DESCRIPTION_TEMPLATE = "Magic values should not be passed to " +
@@ -69,17 +71,11 @@ public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionT
             @Override
             public void visitMethodCallExpression(PsiMethodCallExpression expression) {
                 PsiMethod method = (PsiMethod) expression.getMethodExpression().resolve();
-                PsiParameterList parameterList = null;
-                try {
-                    parameterList = method.getParameterList();
-                } catch (NullPointerException npe) {
+                if (method == null || !method.hasParameters()) {
                     super.visitMethodCallExpression(expression);
                     return;
                 }
-                if (parameterList.getParametersCount() == 0) {
-                    super.visitMethodCallExpression(expression);
-                    return;
-                }
+                PsiParameter[] parameterList = method.getParameterList().getParameters();
                 if (isBlackListed(method, parameterList)) {
                     super.visitMethodCallExpression(expression);
                     return;
@@ -102,20 +98,19 @@ public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionT
                         } else if (expr instanceof PsiExpression && isLiteral((PsiExpression) expr)) {
                             if (!hasComment) {
                                 // Varargs have more commas than parameters
-                                if (index < parameterList.getParametersCount()) {
-                                    PsiParameter param = parameterList.getParameters()[index];
-                                    SmartPsiElementPointer<PsiElement> smartParamLiteral =
-                                            SmartPointerManager.getInstance(expression.getProject()).createSmartPsiElementPointer(expr);
-                                    holder.registerProblem(expr, DESCRIPTION_TEMPLATE,
-                                            ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                                            new LiteralParamQuickFix(smartParamLiteral, param.getName()));
+                                if (index < parameterList.length) {
+                                    PsiParameter param = parameterList[index];
+                                    if (!param.isVarArgs()) {
+                                        SmartPsiElementPointer<PsiElement> smartParamLiteral = SmartPointerManager.getInstance(expression.getProject()).createSmartPsiElementPointer(expr);
+                                        holder.registerProblem(expr, DESCRIPTION_TEMPLATE, ProblemHighlightType.WEAK_WARNING, new LiteralParamQuickFix(smartParamLiteral, param.getName()));
+                                    }
                                 }
                             }
                         }
                     }
                 } catch (Exception e) {
                     LOG.error(String.format("Text: %s; Method: %s; Param Count: %s; index: %d; " +
-                                    "hasComment: %s", expression.getText(), method, parameterList.getParametersCount(),
+                                    "hasComment: %s", expression.getText(), method, parameterList.length,
                             index, hasComment), e);
                 }
 
@@ -162,6 +157,7 @@ public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionT
             "(Strict)?Math\\..*",
         ".*\\.singleton\\(.*\\)",
             ".*\\.singletonList\\(.*\\)",
+            "Optional\\..*",
             "ImmutableSet\\.of\\(.*\\)",
             "ImmutableList\\.of\\(.*\\)",
             "ImmutableMultiset\\.of\\(.*\\)",
@@ -170,9 +166,9 @@ public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionT
             "ImmutableSortedSet\\.of\\(.*\\)",
             "Arrays\\.asList\\(.*\\)").stream().map(Pattern::compile).collect(toList());
 
-    private boolean isBlackListed(PsiMethod method, PsiParameterList parameterList) {
+    private boolean isBlackListed(PsiMethod method, PsiParameter[] parameterList) {
         String paramPattern =
-                Arrays.stream(parameterList.getParameters()).map(PsiNamedElement::getName).collect(Collectors.joining(", ", "(", ")"));
+                Arrays.stream(parameterList).map(PsiNamedElement::getName).collect(Collectors.joining(", ", "(", ")"));
 
       String className = PsiTreeUtil.getParentOfType(method, PsiClass.class).getName();
       String signature = String.format("%s.%s%s", className, method.getName(), paramPattern);
@@ -201,7 +197,7 @@ public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionT
         return true;
     }
 
-    private static class LiteralParamQuickFix implements LocalQuickFix {
+    private static class LiteralParamQuickFix implements RefactoringQuickFix {
 
         private final SmartPsiElementPointer<PsiElement> paramLiteral;
         private final String paramName;
@@ -215,6 +211,12 @@ public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionT
         @NotNull
         public String getName() {
             return "Add inline comment for parameter";
+        }
+
+        @NotNull
+        @Override
+        public RefactoringActionHandler getHandler() {
+            return null;
         }
 
         @Override
