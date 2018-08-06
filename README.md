@@ -1,4 +1,5 @@
 # Literal Argument Code Inspection for Intellij
+[![codebeat badge](https://codebeat.co/badges/11b2550c-76af-4d42-a2ae-eb595e7df013)](https://codebeat.co/projects/github-com-edarke-literal-arguments-plugin-master)
 
 This inspection finds literals passed as arguments to methods without comments. It is often not 
 clear from context what purpose a literal parameter serves, so Intellij shows parameter hints for
