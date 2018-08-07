@@ -1,20 +1,39 @@
 package com.github.edarke.literalcomments;
 
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiJavaToken;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameter;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.CodeStyleManager;
+
 import java.util.Optional;
 
-interface SettingAccessor {
+interface LiteralFix {
 
   String DEFAULT_COMMENT_FORMAT = "/* %s= */";
   String COMMENT_FORMAT_KEY = "DEFAULT_COMMENT_FORMAT";
 
+
+  default boolean isCommented(PsiExpression argument) {
+    PsiElement sibling = argument;
+    while ((sibling = sibling.getPrevSibling()) != null && !(sibling instanceof PsiJavaToken)) {
+      if (sibling instanceof PsiComment){
+        return true;
+      }
+    }
+    return false;
+  }
+
   default String getCommentFormat() {
     return PropertiesComponent.getInstance().getValue(COMMENT_FORMAT_KEY, DEFAULT_COMMENT_FORMAT);
+  }
+
+  default void addComment(Project project, String argumentName, PsiExpression literalArgument) {
+    PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
+    String commentContent = String.format(getCommentFormat(), argumentName);
+    PsiComment comment = factory.createCommentFromText(commentContent, null);
+    literalArgument.getParent().addBefore(comment, literalArgument);
+    deletePostComment(literalArgument, commentContent);
+    CodeStyleManager.getInstance(project).reformat(literalArgument.getParent());
   }
 
   default void setCommentFormat(String format){
@@ -36,7 +55,7 @@ interface SettingAccessor {
     }
   }
 
-  default void delelePostComment(PsiElement element, String comment) {
+  default void deletePostComment(PsiElement element, String comment) {
     comment = comment.replaceAll("[ =]", "");
 
     PsiElement sibling = element;

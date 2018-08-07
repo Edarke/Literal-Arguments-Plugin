@@ -13,7 +13,7 @@ import static com.github.edarke.literalcomments.Test.*;
 
 @SuppressWarnings({"UnusedReturnValue", "WeakerAccess", "Guava",
     "OptionalUsedAsFieldOrParameterType", "unused", "deprecation", "ResultOfMethodCallIgnored",
-    "UseCompareMethod", "CachedNumberConstructorCall"})
+    "UseCompareMethod", "CachedNumberConstructorCall", "RedundantTypeArguments"})
 public class TestIgnore {
 
   static {
@@ -42,6 +42,11 @@ public class TestIgnore {
     nonnullObject_shouldBeIgnored(new Object(), new Object());
     nonnullObject_shouldBeIgnored(/* o= */ null, /* five= */ 5);
     createArray(1, 2, 3, 4);
+    testChar('a', 'b');
+  }
+
+  public static boolean testChar(char a, char b) {
+    return a < b;
   }
 
   public static Object[] createArray(Object... vars) {

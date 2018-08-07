@@ -1,17 +1,15 @@
 package com.github.edarke.literalcomments;
 
-import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class OptionalRefactor extends PsiElementBaseIntentionAction implements IntentionAction, SettingAccessor {
+public class OptionalRefactor extends PsiElementBaseIntentionAction implements LiteralFix {
 
   @NotNull
   public String getText() {
@@ -48,7 +46,7 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements I
     }
 
     int index = findExpressionOnWayToLeaf(arguments, elementUnderCursor);
-    return index < parameters.length;
+    return index < parameters.length && !isCommented(arguments.getExpressions()[index]);
   }
 
   private PsiElement findChildOnWayToLeaf(PsiElement list, PsiElement leaf) {
@@ -90,13 +88,7 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements I
       PsiExpression argument = arguments.getExpressions()[index];
       if (index < parameters.length) {
         PsiParameter param = parameters[index];
-
-        final PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-        String commentContent = String.format(getCommentFormat(), param.getName());
-        PsiComment comment = factory.createCommentFromText(commentContent, null);
-        argument.getParent().addBefore(comment, argument);
-        delelePostComment(argument, commentContent);
-        CodeStyleManager.getInstance(project).reformat(arguments);
+        addComment(project, param.getName(), argument);
       }
     }
   }

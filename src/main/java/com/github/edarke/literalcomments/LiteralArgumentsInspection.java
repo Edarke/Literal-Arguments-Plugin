@@ -31,7 +31,7 @@ import java.awt.*;
  *
  * @author Evan Darke
  */
-public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionTool implements SettingAccessor {
+class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionTool implements LiteralFix {
 
     @NotNull
     public String getDisplayName() {
@@ -69,7 +69,6 @@ public class LiteralArgumentsInspection extends AbstractBaseJavaLocalInspectionT
                 setCommentFormat(formatOptionField.getText());
             }
         });
-
         panel.add(formatOptionField);
         return panel;
     }
