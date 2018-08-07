@@ -42,12 +42,13 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements I
     }
 
     PsiMethod method = methodCall.resolveMethod();
-    if (method == null || !method.hasParameters()) {
+    PsiParameter[] parameters = getParametersOfMethod(method).orElse(null);
+    if (parameters == null){
       return false;
     }
 
     int index = findExpressionOnWayToLeaf(arguments, elementUnderCursor);
-    return index < method.getParameters().length;
+    return index < parameters.length;
   }
 
   private PsiElement findChildOnWayToLeaf(PsiElement list, PsiElement leaf) {
@@ -83,8 +84,8 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements I
     }
 
     PsiMethod method = methodCall.resolveMethod();
-    if (method != null && method.hasParameters()) {
-      PsiParameter[] parameters = method.getParameterList().getParameters();
+    PsiParameter[] parameters = getParametersOfMethod(method).orElse(null);
+    if (parameters != null) {
       int index = findExpressionOnWayToLeaf(arguments, elementUnderCursor);
       PsiExpression argument = arguments.getExpressions()[index];
       if (index < parameters.length) {
@@ -94,6 +95,7 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements I
         String commentContent = String.format(getCommentFormat(), param.getName());
         PsiComment comment = factory.createCommentFromText(commentContent, null);
         argument.getParent().addBefore(comment, argument);
+        delelePostComment(argument, commentContent);
         CodeStyleManager.getInstance(project).reformat(arguments);
       }
     }

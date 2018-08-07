@@ -35,11 +35,14 @@ class LiteralParamQuickFix implements LocalQuickFix, SettingAccessor {
             String commentContent = String.format(getCommentFormat(), paramName);
             PsiComment comment = factory.createCommentFromText(commentContent, /* psiElement= */null);
             paramLiteral.getElement().getParent().addBefore(comment, paramLiteral.getElement());
-            CodeStyleManager.getInstance(project).reformat(descriptor.getPsiElement());
+            delelePostComment(paramLiteral.getElement(), commentContent);
+            CodeStyleManager.getInstance(project).reformat(descriptor.getPsiElement().getParent());
         } catch (Exception e) {
             LOG.error(e);
         }
     }
+
+
 
     @NotNull
     public String getFamilyName() {
