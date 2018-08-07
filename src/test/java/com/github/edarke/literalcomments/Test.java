@@ -12,7 +12,7 @@ public class Test {
         stringLiteral_shouldBeIgnored(null, null);
 
 
-        primitives_shouldHaveComments(0, (short) 0   /*shorter*/, 0f, 0.0, 0L, false, (byte) 0, '0');
+        primitives_shouldHaveComments(0, (short) 0   /*shorter*/, 0f, 0.0, 0L, false, (byte) 0);
 
         javaEmptyOptional_shouldHaveComments(Optional.empty(), Optional.<String>empty());
         javaEmptyOptional_shouldHaveComments(java.util.Optional.<String>empty(), java.util.Optional.empty());
@@ -31,8 +31,8 @@ public class Test {
         return arg;
     }
 
-    public static String primitives_shouldHaveComments(int integer, short shorter, float floater, double doubler, long longer, boolean bool, byte bite, char character) {
-        return "" + integer + shorter + floater + doubler + longer + bool + bite + character;
+    public static String primitives_shouldHaveComments(int integer, short shorter, float floater, double doubler, long longer, boolean bool, byte bite) {
+        return "" + integer + shorter + floater + doubler + longer + bool + bite;
     }
 
     public static <T> T javaEmptyOptional_shouldHaveComments(Optional<T> opt, Optional<T> opt2) {

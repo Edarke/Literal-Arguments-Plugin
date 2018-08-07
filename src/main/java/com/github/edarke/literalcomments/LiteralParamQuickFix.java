@@ -2,23 +2,20 @@ package com.github.edarke.literalcomments;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.RefactoringQuickFix;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
-import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.refactoring.RefactoringActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-class LiteralParamQuickFix implements LocalQuickFix, SettingAccessor {
+class LiteralParamQuickFix implements LocalQuickFix, LiteralFix {
 
     private static final Logger LOG = Logger.getInstance(LiteralArgumentsInspection.class.getName());
 
 
-    private final SmartPsiElementPointer<PsiElement> paramLiteral;
+    private final SmartPsiElementPointer<PsiExpression> paramLiteral;
     private final String paramName;
 
-    LiteralParamQuickFix(SmartPsiElementPointer<PsiElement> paramLiteral, String paramName) {
+    LiteralParamQuickFix(SmartPsiElementPointer<PsiExpression> paramLiteral, String paramName) {
         this.paramLiteral = paramLiteral;
         this.paramName = paramName;
     }
@@ -31,12 +28,7 @@ class LiteralParamQuickFix implements LocalQuickFix, SettingAccessor {
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
         try {
-            final PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-            String commentContent = String.format(getCommentFormat(), paramName);
-            PsiComment comment = factory.createCommentFromText(commentContent, /* psiElement= */null);
-            paramLiteral.getElement().getParent().addBefore(comment, paramLiteral.getElement());
-            delelePostComment(paramLiteral.getElement(), commentContent);
-            CodeStyleManager.getInstance(project).reformat(descriptor.getPsiElement().getParent());
+            addComment(project, this.paramName, paramLiteral.getElement());
         } catch (Exception e) {
             LOG.error(e);
         }
