@@ -7,6 +7,7 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.JavaElementVisitor;
+import com.intellij.psi.PsiCallExpression;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiExpression;
 import com.intellij.psi.PsiExpressionList;
@@ -14,6 +15,7 @@ import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.PsiNewExpression;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeCastExpression;
@@ -105,15 +107,17 @@ class LiteralArgumentElementVisitor extends JavaElementVisitor implements Litera
     return false;
   }
 
-  @Override
-  public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    PsiMethod method = (PsiMethod) expression.getMethodExpression().resolve();
+  private void getQuickFixes(PsiMethod method, PsiCallExpression expression) {
     PsiParameter[] parameters = getParametersOfMethod(method).orElse(new PsiParameter[0]);
     int i = 0;
 
     try {
       if (isBlackListed(method, parameters)) {
-        super.visitMethodCallExpression(expression);
+        super.visitCallExpression(expression);
+        return;
+      }
+
+      if (expression.getArgumentList() == null) {
         return;
       }
 
@@ -135,5 +139,19 @@ class LiteralArgumentElementVisitor extends JavaElementVisitor implements Litera
       LOG.error(String.format("Text: %s; Method: %s; Param Count: %s; index: %d",
           expression.getText(), method, parameters.length, i), e);
     }
+  }
+
+  @Override
+  public void visitNewExpression(PsiNewExpression expression) {
+    PsiMethod method = expression.resolveConstructor();
+    getQuickFixes(method, expression);
+  }
+
+
+
+  @Override
+  public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+    PsiMethod method = (PsiMethod) expression.getMethodExpression().resolve();
+    getQuickFixes(method, expression);
   }
 }

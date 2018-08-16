@@ -10,7 +10,7 @@ public class Test {
     static {
         nonnullObject_shouldBeIgnored(null, null);
         stringLiteral_shouldBeIgnored(null, null);
-
+        new Test(1, 2);
 
         primitives_shouldHaveComments(0, (short) 0   /*shorter*/, 0f, 0.0, 0L, false, (byte) 0);
 
@@ -21,6 +21,10 @@ public class Test {
 
         guavaAbsentOptional_shouldHaveComments(com.google.common.base.Optional.absent(), com.google.common.base.Optional.<String>absent());
         guavaAbsentOptional_shouldHaveComments(null, null);
+    }
+
+    public Test(int x, int y){
+
     }
 
     public static Object nonnullObject_shouldBeIgnored(Object o1, Object o2) {

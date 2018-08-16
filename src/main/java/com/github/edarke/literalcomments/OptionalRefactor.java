@@ -34,12 +34,12 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements L
       return false;
     }
 
-    PsiMethodCallExpression methodCall = PsiTreeUtil.getParentOfType(arguments, PsiMethodCallExpression.class);
+    PsiCallExpression methodCall = PsiTreeUtil.getParentOfType(arguments, PsiMethodCallExpression.class, PsiNewExpression.class);
     if (methodCall == null) {
-      return false;
+        return false;
     }
+    PsiMethod method = methodCall instanceof PsiNewExpression? ((PsiNewExpression) methodCall).resolveConstructor() : methodCall.resolveMethod();
 
-    PsiMethod method = methodCall.resolveMethod();
     PsiParameter[] parameters = getParametersOfMethod(method).orElse(null);
     if (parameters == null){
       return false;

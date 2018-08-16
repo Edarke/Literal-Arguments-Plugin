@@ -43,7 +43,10 @@ public class TestIgnore {
     nonnullObject_shouldBeIgnored(/* o= */ null, /* five= */ 5);
     createArray(1, 2, 3, 4);
     testChar('a', 'b');
+    new TestIgnore(0);
   }
+
+  TestIgnore(int x){}
 
   public static boolean testChar(char a, char b) {
     return a < b;
