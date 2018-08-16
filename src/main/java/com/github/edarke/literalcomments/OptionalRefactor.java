@@ -75,13 +75,13 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements L
     if (arguments == null) {
       return;
     }
-    PsiMethodCallExpression methodCall = PsiTreeUtil.getParentOfType(arguments,
-        PsiMethodCallExpression.class);
+    PsiCallExpression methodCall = PsiTreeUtil.getParentOfType(arguments, PsiMethodCallExpression.class, PsiNewExpression.class);
     if (methodCall == null) {
       return;
     }
+    PsiMethod method = methodCall instanceof PsiNewExpression? ((PsiNewExpression) methodCall).resolveConstructor() : methodCall.resolveMethod();
 
-    PsiMethod method = methodCall.resolveMethod();
+
     PsiParameter[] parameters = getParametersOfMethod(method).orElse(null);
     if (parameters != null) {
       int index = findExpressionOnWayToLeaf(arguments, elementUnderCursor);
