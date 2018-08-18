@@ -20,26 +20,26 @@ import org.jetbrains.annotations.NotNull;
 
 public class LiteralArgumentsProvider implements ApplicationComponent, InspectionToolProvider {
 
-    @Override
-    public void initComponent() {
-        // do nothing
-    }
+  @Override
+  public void initComponent() {
+    // do nothing
+  }
 
-    @Override
-    public void disposeComponent() {
-        // do nothing
-    }
+  @Override
+  public void disposeComponent() {
+    // do nothing
+  }
 
-    @Override
-    @NotNull
-    public String getComponentName() {
-        return "InspectionRegistration";
-    }
+  @Override
+  @NotNull
+  public String getComponentName() {
+    return "InspectionRegistration";
+  }
 
 
-    @NotNull
-    public Class[] getInspectionClasses() {
-        return new Class[]{LiteralArgumentsInspection.class};
-    }
+  @NotNull
+  public Class[] getInspectionClasses() {
+    return new Class[]{LiteralArgumentsInspection.class};
+  }
 }
 

@@ -16,9 +16,15 @@ package com.github.edarke.literalcomments;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiComment;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementFactory;
+import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiJavaToken;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-
 import java.util.Optional;
 
 interface LiteralFix {
@@ -30,7 +36,7 @@ interface LiteralFix {
   default boolean isCommented(PsiExpression argument) {
     PsiElement sibling = argument;
     while ((sibling = sibling.getPrevSibling()) != null && !(sibling instanceof PsiJavaToken)) {
-      if (sibling instanceof PsiComment){
+      if (sibling instanceof PsiComment) {
         return true;
       }
     }
@@ -50,10 +56,10 @@ interface LiteralFix {
     CodeStyleManager.getInstance(project).reformat(literalArgument.getParent());
   }
 
-  default void setCommentFormat(String format){
+  default void setCommentFormat(String format) {
     format = format.trim();
     String testFormat = String.format(format, "test_param"); // assert valid
-    if (testFormat.startsWith("/*") && testFormat.endsWith("*/")){
+    if (testFormat.startsWith("/*") && testFormat.endsWith("*/")) {
       PropertiesComponent.getInstance().setValue(COMMENT_FORMAT_KEY, format);
     }
   }
@@ -70,7 +76,7 @@ interface LiteralFix {
   }
 
   default void deletePostComment(PsiElement element, String comment) {
-    comment = comment.replaceAll("[ =]", "");
+    comment = comment.replaceAll("[ =_]", "");
 
     PsiElement sibling = element;
     while ((sibling = sibling.getNextSibling()) != null && !(sibling instanceof PsiJavaToken)) {

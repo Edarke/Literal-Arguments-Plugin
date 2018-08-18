@@ -14,8 +14,9 @@
 
 package com.github.edarke.literalcomments;
 
+import static com.github.edarke.literalcomments.Type.CONSTRUCTOR;
+import static com.github.edarke.literalcomments.Type.METHOD;
 import static java.util.stream.Collectors.toList;
-
 import com.google.common.collect.ImmutableSet;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -40,15 +41,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NonNls;
 
 class LiteralArgumentElementVisitor extends JavaElementVisitor implements LiteralFix {
 
   private static final Logger LOG = Logger.getInstance(LiteralArgumentsInspection.class.getName());
 
-  @NonNls
-  private static final String DESCRIPTION_TEMPLATE = "Magic values should not be passed to " +
-      "methods without a comment.";
 
   /**
    * These classes are self-documenting and shouldn't need a comment.
@@ -123,6 +120,7 @@ class LiteralArgumentElementVisitor extends JavaElementVisitor implements Litera
 
   private void getQuickFixes(PsiMethod method, PsiCallExpression expression) {
     PsiParameter[] parameters = getParametersOfMethod(method).orElse(new PsiParameter[0]);
+    Type type = expression instanceof PsiNewExpression ? CONSTRUCTOR : METHOD;
     int i = 0;
 
     try {
@@ -144,9 +142,9 @@ class LiteralArgumentElementVisitor extends JavaElementVisitor implements Litera
           SmartPsiElementPointer<PsiExpression> smartParamLiteral =
               SmartPointerManager.getInstance(expression.getProject())
                   .createSmartPsiElementPointer(paramExp);
-          holder.registerProblem(paramExp, DESCRIPTION_TEMPLATE,
+          holder.registerProblem(paramExp, type.description,
               ProblemHighlightType.WEAK_WARNING, new LiteralParamQuickFix(smartParamLiteral,
-                  paramDecl.getName()));
+                  paramDecl.getName(), type));
         }
       }
     } catch (Exception e) {
@@ -160,7 +158,6 @@ class LiteralArgumentElementVisitor extends JavaElementVisitor implements Litera
     PsiMethod method = expression.resolveConstructor();
     getQuickFixes(method, expression);
   }
-
 
 
   @Override

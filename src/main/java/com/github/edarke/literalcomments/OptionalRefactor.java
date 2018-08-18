@@ -17,7 +17,14 @@ package com.github.edarke.literalcomments;
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiCallExpression;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiExpressionList;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.PsiNewExpression;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +43,15 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements L
   }
 
   @Override
-  public boolean startInWriteAction() {return true;}
+  public boolean startInWriteAction() {
+    return true;
+  }
 
   @Override
-  public boolean isAvailable(@NotNull Project project, Editor editor, @Nullable PsiElement elementUnderCursor) {
-    PsiExpressionList arguments = PsiTreeUtil.getParentOfType(elementUnderCursor, PsiExpressionList.class);
+  public boolean isAvailable(@NotNull Project project, Editor editor,
+      @Nullable PsiElement elementUnderCursor) {
+    PsiExpressionList arguments = PsiTreeUtil
+        .getParentOfType(elementUnderCursor, PsiExpressionList.class);
     if (arguments == null) {
       return false;
     }
@@ -48,14 +59,16 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements L
       return false;
     }
 
-    PsiCallExpression methodCall = PsiTreeUtil.getParentOfType(arguments, PsiMethodCallExpression.class, PsiNewExpression.class);
+    PsiCallExpression methodCall = PsiTreeUtil
+        .getParentOfType(arguments, PsiMethodCallExpression.class, PsiNewExpression.class);
     if (methodCall == null) {
-        return false;
+      return false;
     }
-    PsiMethod method = methodCall instanceof PsiNewExpression? ((PsiNewExpression) methodCall).resolveConstructor() : methodCall.resolveMethod();
+    PsiMethod method = methodCall instanceof PsiNewExpression ? ((PsiNewExpression) methodCall)
+        .resolveConstructor() : methodCall.resolveMethod();
 
     PsiParameter[] parameters = getParametersOfMethod(method).orElse(null);
-    if (parameters == null){
+    if (parameters == null) {
       return false;
     }
 
@@ -84,17 +97,20 @@ public class OptionalRefactor extends PsiElementBaseIntentionAction implements L
   }
 
   @Override
-  public void invoke(@NotNull Project project, Editor editor, @NotNull PsiElement elementUnderCursor) throws IncorrectOperationException {
-    PsiExpressionList arguments = PsiTreeUtil.getParentOfType(elementUnderCursor, PsiExpressionList.class);
+  public void invoke(@NotNull Project project, Editor editor,
+      @NotNull PsiElement elementUnderCursor) throws IncorrectOperationException {
+    PsiExpressionList arguments = PsiTreeUtil
+        .getParentOfType(elementUnderCursor, PsiExpressionList.class);
     if (arguments == null) {
       return;
     }
-    PsiCallExpression methodCall = PsiTreeUtil.getParentOfType(arguments, PsiMethodCallExpression.class, PsiNewExpression.class);
+    PsiCallExpression methodCall = PsiTreeUtil
+        .getParentOfType(arguments, PsiMethodCallExpression.class, PsiNewExpression.class);
     if (methodCall == null) {
       return;
     }
-    PsiMethod method = methodCall instanceof PsiNewExpression? ((PsiNewExpression) methodCall).resolveConstructor() : methodCall.resolveMethod();
-
+    PsiMethod method = methodCall instanceof PsiNewExpression ? ((PsiNewExpression) methodCall)
+        .resolveConstructor() : methodCall.resolveMethod();
 
     PsiParameter[] parameters = getParametersOfMethod(method).orElse(null);
     if (parameters != null) {
