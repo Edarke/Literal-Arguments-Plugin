@@ -1,7 +1,7 @@
 # Literal Argument Code Inspection for Intellij
 [![codebeat badge](https://codebeat.co/badges/11b2550c-76af-4d42-a2ae-eb595e7df013)](https://codebeat.co/projects/github-com-edarke-literal-arguments-plugin-master)
 
-This inspection finds literals passed as arguments to methods without comments. It is often not 
+This inspection finds literals passed as arguments to methods and constructors without comments. It is often not 
 clear from context what purpose a literal parameter serves, so Intellij shows parameter hints for
  such cases. However, since most companies do not mandate the use of a specific IDE, style guides
   may require explicit comments for literal arguments. 
@@ -28,7 +28,8 @@ Supported Literal Types:
 * float
 * double
 * null
-* java.util.Optional.empty() and com.google.common.base.Optional.absent()
+* java.util.Optional.empty()
+* com.google.common.base.Optional.absent()
 * Casting one of the above to another type (eg (byte) 0)
 
 Literal chars and Strings are ignored because their purpose is usually evident from their content

@@ -2,7 +2,7 @@
     <vendor email="evancdarke@gmail.com" url="https://github.com/Edarke/Literal-Arguments-Plugin">Evan Darke</vendor>
     <id>LiteralArguments</id>
     <name>Literal Arguments</name>
-    <version>0.1.1</version>
+    <version>0.2.1</version>
     <description><![CDATA[
     <p>Produces a warning when literals arguments are passed to methods without a comment.
         Suggests QuickFix to add inline comments to method calls with literal arguments. </p>
