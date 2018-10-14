@@ -15,13 +15,17 @@
 package com.github.edarke.literalcomments;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toSet;
 
 @SuppressWarnings({"UnusedReturnValue", "WeakerAccess", "Guava",
     "OptionalUsedAsFieldOrParameterType", "unused", "ResultOfMethodCallIgnored",
     "OptionalAssignedToNull", "ConstantConditions"})
 public class Test {
 
-    static {
+    private static void test() {
         nonnullObject_shouldBeIgnored(null, null);
         stringLiteral_shouldBeIgnored(null, null);
         new Test(1, 2);
@@ -60,6 +64,5 @@ public class Test {
     public static <T> T guavaAbsentOptional_shouldHaveComments(com.google.common.base.Optional<T> opt, com.google.common.base.Optional<T> opt2) {
         return opt.orNull();
     }
-
 
 }

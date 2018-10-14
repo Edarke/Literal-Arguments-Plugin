@@ -19,6 +19,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import com.google.common.collect.Iterables;
+
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
@@ -33,7 +35,9 @@ public class TestIgnore {
   static {
     "Hello, World!".charAt(0);
     "Test".substring(1);
+    "".subSequence(1, 2);
     "TEST".substring(0, 3);
+    new TestIgnore(5);
     ImmutableSet.of(1, 2, 3, 4 /* e4*/, 5);
     ImmutableMap.of(0, 1, 2+1, 3);
     new Integer(5).equals(5);
